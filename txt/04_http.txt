@@ -1,0 +1,362 @@
+# http모듈을 이용한 웹서버구축
+
+## 1. server
+server객체의 메소드
+* listen(port[, callback]) : 서버실행
+* close([callback]) : 서버종료
+
+서버객체는 EventEmitter객체를 기반으로 하므로, 바로 이벤트를 연결할 수 있음.
+* request : 클라이언트가 요청시 
+* connection : 클라이언트 접속시
+* close : 서버종료시
+* checkContinue : 클라이언트가 지속적인 연결을 하고 있을때
+* upgrade : 클라이언트가 http 업그레이드를 요청시
+* clientError : 클라이언트에서 오류발생시
+
+@09_node.http/01_node.http.server.js
+
+    //http모듈 추출
+    var http  = require('http');
+    //웹서버생성
+    var server = http.createServer();
+
+    //server객체에 이벤트연결
+    server.on('request', code =>{
+        console.log("request on");
+    });
+
+    server.on('connection', code =>{
+        console.log("connection on");
+    });
+
+    server.on('close', code =>{
+        console.log("close on");
+    });
+
+
+    //웹서버실행
+    server.listen(52273);
+
+    /*
+    //connection이벤트가 두번호출??
+        connection on
+        connection on
+        request on
+
+    */
+
+이중 request, response는 별도의 on메소드 없이 createServer메소드의 매개변수로 전달가능함.
+
+    var server = http.createServer((request, response)=>{
+        response.writeHead(200, {'Content-Type':'text/html'});
+        response.end('<h1>Hello world</h1>')
+    });
+
+
+
+
+## 2.response
+response객체 메소드
+* writeHead(statusCode[,statusMessage][,headers]) : 응답헤더작성
+* end([data][,encoding][,callback]) : 응답본문작성
+
+@09_node.http/02_node.http.response.js
+
+    //웹서버를 만들고 실행
+    require('http').createServer(function (req,res){
+        res.writeHead(200, {'Content-Type':'text/html'});
+        res.end('<h1>Hello World...</h1>');
+    }).listen(9999, function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+
+## 3. file system
+1. html
+
+@09_node.http/03_node.http.fs/index.html
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Document</title>
+    </head>
+    <body>
+        <h1>Hello Node.js</h1>
+        <h2>author : nobodj</h2>
+        <hr>
+        <p>
+            Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.
+        </p>
+    </body>
+    </html>
+
+
+@09_node.http/03_node.http.fs/http.fs.js
+
+    //모듈추출
+    var fs = require('fs');
+    var http = require('http');
+
+    //웹서버생성
+    http.createServer(function(req, res){
+        //html파일읽기
+        fs.readFile('index.html', function(err, data){
+            res.writeHead(200,{'Content-Type':'text/html'});
+            res.end(data);
+        });
+    }).listen(9999,function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+
+2. image
+truckHeavyLoaded.jpg 동일한 경로에 추가
+MIME타입 : image/jpeg
+
+@09_node.http/03_node.http.fs/http.fs.js
+
+    //이미지파일 제공용 서버시작
+    http.createServer(function(req, res){
+        //이미지파일열기
+        fs.readFile('truckHeavyLoaded.jpg', function(err,data){
+            res.writeHead(200, {'Content-Type':'image/jpeg'});
+            res.end(data);
+        });
+    }).listen(10010,function(){
+        console.log('Image Server running at http://127:0.0.1:10010/');
+    });
+
+
+3. mp3파일
+1-03 Closer (feat. Halsey).mp3 동일한 경로에 추가
+MIME타입 : audio/mp3
+
+@09_node.http/03_node.http.fs/http.fs.js
+
+    //음악파일 제공용 서버시작
+    http.createServer(function(req, res){
+        //이미지파일열기
+        fs.readFile('1-03 Closer (feat. Halsey).mp3', function(err,data){
+            res.writeHead(200, {'Content-Type':'audio/mp3'});
+            res.end(data);
+        });
+    }).listen(10011,function(){
+        console.log('Music Server running at http://127:0.0.1:10011/');
+    });
+
+
+
+## 4. cookie
+
+@09_node.http/04_node.http.cookie.js
+`request.headers.cookie`를 통해 쿠키값에 접근할 수 있음. 
+첫 접속시에는 쿠키값을 가지고 있지않으므로, `undefined`, 새로고침하면 `breakfast=toast; dinner=chicken`이 출력됨.
+
+    var http = require('http');
+
+    http.createServer(function(req,res){
+        //expire date설정
+        var d = new Date();
+        d.setDate(d.getDate()+7);
+
+        console.log(d.toString());//Wed Aug 08 2018 00:58:25 GMT+0900 (KST)
+        console.log(d.toUTCString());//Tue, 07 Aug 2018 15:58:25 GMT => UTC timezone 우리나라 표준시보다 9시간 느림.
+
+        //cookie설정
+        res.writeHead(200, {
+            'Content-Type':'text/html',
+            'Set-Cookie':[
+                'breakfast=toast;Expires='+d.toUTCString(),//Tue, 07 Aug 2018 15:52:12 GMT => UTC timezone의 시각반납
+                'dinner=chicken'
+            ]
+        });
+
+        //쿠키를 본문에 출력
+        res.end('<h1>'+req.headers.cookie+'</h1>')
+
+    }).listen(9999, function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+
+
+## 5. statusCode별 응답작성
+1. redirect
+responseHeader에 location값으로 url을 전달한다. 이때 statusCode는 200이 아닌 redirect를 의미하는 3xx임.
+
+####3xx: Redirection
+
+StatusCode  | Message | Description
+-|-|-
+300 | Multiple Choices | A link list. The user can select a link and go to that location. Maximum five addresses | 
+301 | Moved Permanently | The requested page has moved to a new URL 
+302 | Found | The requested page has moved temporarily to a new URL 
+303 | See Other | The requested page can be found under a different URL
+304 | Not Modified | Indicates the requested page has not been modified since last requested
+306 | Switch Proxy | No longer used
+307 | Temporary Redirect | The requested page has moved temporarily to a new URL
+308 | Resume Incomplete | Used in the resumable requests proposal to resume aborted PUT or POST requests
+
+
+@09_node.http/05_node.http.redirect.js
+
+    var http = require('http');
+
+    http.createServer(function(req,res){
+        res.writeHead(302,{
+            'Location':'https://iei.or.kr'
+        });
+        res.end();
+    }).listen(9999,function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+2. not found
+
+@09_node.http/05_node.http.notfound.js
+
+    var http = require('http');
+
+    http.createServer(function(req,res){
+        res.writeHead(404);//404에러이지만, 서버가 종료되지 않음.
+        res.end();
+    }).listen(9999,function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+## 6. request
+
+### 1. url.pathname
+
+@09_node.http/01_node.url.pathname/app.js
+
+    var http = require('http');
+    var fs = require('fs');
+    var url = require('url');
+
+    http.createServer(function(req,res){
+        //path parsing
+        //pathname은 대소문자를 구분한다. 구분하지 않으려면, toUpperCase()|toLowerCase()를 사용하면 된다.
+        var pathname = url.parse(req.url).pathname;
+
+        if(pathname == '/'){
+            fs.readFile('index.html',function(err,data){
+                res.writeHead(200,{
+                    'Content-Type':'text/html'
+                });
+                res.end(data);
+            });
+        }
+        else if(pathname == '/other'){
+            fs.readFile('other.html',function(err,data){
+                res.writeHead(200,{
+                    'Content-Type':'text/html'
+                });
+                res.end(data);
+            });
+        }
+    }).listen(9999,function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+@09_node.http/01_node.url.pathname/index.html
+`/other`로 페이지 이동
+없는 url을 치게되면, 고착상태에 빠짐.
+
+    <a href="/other">other.html로 이동</a>
+
+@09_node.http/01_node.url.pathname/other.html
+`/`로 페이지이동
+
+    <a href="/other">other.html로 이동</a>
+
+
+### 2.request.method
+method명은 알파벳 대문자를 이용함.
+
+1. GET
+@09_node.http.request/02_node.request.method/reqeust.method.get.js
+url모듈의 parse메소드를 사용함.
+두번째 파라미터는 query string의 parse여부임. 
+* true : js obj리턴
+* false : string
+
+    var http = require('http');
+    var url = require('url');
+
+    http.createServer(function(req,res){
+        //GET방식의 queryString추출은 url객체의 parse메소드를 이용함.
+        //두번째 파라미터는 query string의 parse여부임. t:js obj리턴, f:string
+        var qs = url.parse(req.url, true).query;
+
+        //전달받은 query string 출력
+        res.writeHead(200, {"Content-Type":"text/html"});
+        res.end("<h1>"+JSON.stringify(qs)+"</h1>");
+
+    }).listen(9999,function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+2. POST
+post는 data이벤트핸들러를 이용해서 파라미터값에 접근할 수 있다. 
+또 querystring 모듈의 parse메소드를 통해서 직렬화된 parameter를 자바스크립트객체로 리턴받을수 있다.
+**주의 : 콜백함수 매개변수 data와 data.toString()의 결과가 다르므로 parsing하는 경우에는 반드시 toString()메소드를 사용할 것**
+[request모듈의 end이벤트란?](https://github.com/nodejs/node/issues/2156)
+
+1. 첫번째 호출 GET => form.html 출력
+2. 폼데이터 호출 POST => 전달된 파라미터 출력
+
+@09_node.http.request/02_node.request.method/form.html
+
+
+@09_node.http.request/02_node.request.method/reqeust.method.form.js
+
+     /*
+    //post방식 quertystring접근
+    data.toString() => data_a=%EA%B9%80%EB%8F%99%ED%98%84&data_b=abc
+    JSON.stringify(data) => {"type":"Buffer","data":[100,97,116,97,95,97,61,37,69,65,37,66,57,37,56,48,37,69,66,37,56,70,37,57,57,37,69,68,37,57,56,37,56,52,38,100,97,116,97,95,98,61,97,98,99]}
+    JSON.stringify(querystring.parse(data.toString())) => {"data_a":"김동현","data_b":"ddd"}
+
+    //크롬브라우져는 encoding이 auto-detection으로 변경됨. Set Character Encoding extension을 이용하여, default page encoding값을 UTF-8으로 변경후 정상출력됨.
+
+    */
+
+    var http =  require('http');
+    var fs = require('fs');
+    var querystring = require('querystring');
+
+    http.createServer(function(req,res){
+        if(req.method=='GET'){
+            //GET요청
+            fs.readFile('form.html',function(err,data){
+                res.writeHead(200,{
+                    'Content-Type':'text/html'
+                });
+                res.end(data);
+            });
+        }
+        else if(req.method=='POST'){
+            //POST요청 : data이벤트핸들러
+            req.on('data',function(data){
+                res.writeHead(200,{
+                    'Content-Type':'text/html'
+                });
+                //data.toString() => serialized형태로 출력됨.
+                //querystring.parse(data.toString()) => 반드시 data.toString()을 전달할것.
+                res.end("<h1>"+data+"</h1><h1>"+JSON.stringify(querystring.parse(data.toString()))+"</h1>");//serialized형태로 출력됨.
+                console.log(decodeURIComponent(data.toString()));//인코딩된 한글데이터가 다시 한글로 정상출력
+                console.log(JSON.stringify(data));
+                
+            });
+            
+
+        }
+    }).listen(9999,function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
+
+   

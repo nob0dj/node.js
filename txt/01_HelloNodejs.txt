@@ -1,0 +1,137 @@
+# HelloNodejs
+
+웹브라우져용 script와 달리 최상위객체 window 없음
+
+최상위는 아니지만 global객체 있음.
+
+전역객체
+1. console
+2. exports
+3. process
+
+4. String
+5. Number
+6. Math
+
+
+## console
+
+    console.log('숫자 : %d + %d = %d', 100, 50, 100+50);
+    console.log('문자열 : %s', 'HelloWorld...!','특수문자와 상관없는 추가적인 파라미
+    터');
+    console.log('JSON : %j',{name:"김동현"});
+
+    //시간측정시작
+    console.time('alpha');
+
+    //로직
+    var output;
+    for(var i=0; i<10000; i++){
+        output += i;
+    }
+    console.log('output=%d',output);
+
+    //시간측정끝
+    console.timeEnd('alpha');
+
+
+## process
+웹브라우져의 자바스크립트에는 없는 객체
+* argv
+* env
+* version 
+* versions
+* arch
+* platform
+
+
+    //process.argv
+    //명령어 node 05_node.process --exit 10000
+    process.argv.forEach(function(item, index){
+        //출력
+        console.log(index+' : '+typeof(item)+' : '+item);
+
+        //실행매개변수에 --exit가 있는 경우
+        if(item == '--exit'){
+            //다음실행할 매개변수를 가져오기
+            var exitTime = Number(process.argv[index+1]);
+
+            //일정시간후 종료
+            setTimeout(function(){
+                //exit_code 기본값 0->정상종료, 1->비정상종료(암묵적 약속)
+                process.exit();
+            }, exitTime);
+        }
+    });
+
+    //process객체 속성
+    console.log('- process.env : ',process.env);
+    console.log('- process.version : ',process.version);
+    console.log('- process.versions : ',process.versions);
+    console.log('- process.arch : ',process.arch);
+    console.log('- process.platform : ',process.platform);
+    console.log('- process.connected : ',process.connected);
+    console.log('- process.execArgv : ',process.execArgv);
+    console.log('- process.exitCode : ',process.exitCode);
+    console.log('- process.mainModule : ',process.mainModule);
+    console.log('- process.release : ',process.releaes);
+    console.log('- process.memoryUsage() : ',process.memoryUsage());
+    console.log('- process.uptime : ',process.uptime);
+    console.log('- process.uptime : ',process.uptime);
+    console.log('- process.uptime : ',process.uptime);
+
+
+## module
+
+@06_node.exports/module.js
+exports객체사용
+
+    //절대값을 구하는 메소드 정의
+    //exports객체의 속성으로 정의
+    exports.abs = function(num){
+        if(num>0)
+            return num;
+        else 
+            return -num;
+    };
+
+    //원넓이를 구하는 메소드
+    exports.circleArea = function(r){
+        return r*r*Math.PI;
+    }
+
+
+
+@06_node.exports/main.js
+reuire객체사용
+
+    //모듈 추출 : 현재경로를 반드시 입력할 것(./파일명)
+    //확장자가 없다면, 1.js파일 2.폴더/index.js를 찾는다.
+    //var module = require('./module.js');
+    var module = require('./module_');
+
+    //모듈사용
+    console.log('abs(-273) = ', module.abs(-273));
+    console.log('circleArea(3) = ', module.circleArea(3));
+
+혹은 확장자를 생략하고 폴더안에 index.js를 찾을 수 있음.
+
+@06_node.exports/main.js
+
+    var module = require('./module_');
+
+@06_node.exports/module_/index.js
+
+    //절대값을 구하는 메소드 정의
+    //exports객체의 속성으로 정의
+    exports.abs = function(num){
+        if(num>0)
+            return num;
+        else 
+            return -num;
+    };
+
+    //원넓이를 구하는 메소드
+    exports.circleArea = function(r){
+        return r*r*Math.PI;
+    }

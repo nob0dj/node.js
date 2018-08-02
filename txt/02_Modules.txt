@@ -1,0 +1,441 @@
+# 모듈
+require함수의 매개변수로 요청모듈명을 적고, 해당모듈객체를 리턴받음.
+
+## 1. os
+@07_node.modules/01_node.os.js
+
+    // 모듈을 추출합니다.
+    var os = require('os');
+
+    // 모듈을 사용합니다.
+    console.log(os.hostname());
+    console.log(os.type());
+    console.log(os.platform());
+    console.log(os.arch());
+    console.log(os.release());
+    console.log(os.uptime());
+    console.log(os.loadavg());
+    console.log(os.totalmem());
+    console.log(os.freemem());
+    console.log(os.cpus());
+    console.log(os.networkInterfaces());
+
+    /*
+
+    DONGHYUNs-MacBook-Pro.local
+    Darwin
+    darwin
+    x64
+    16.7.0
+    3287789
+    [ 1.736328125, 1.8544921875, 1.8359375 ]
+    17179869184
+    5243977728
+    [ { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 6422290, nice: 0, sys: 5297740, idle: 30743100, irq: 0 } },
+    { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 709680, nice: 0, sys: 461250, idle: 41266700, irq: 0 } },
+    { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 5737180, nice: 0, sys: 2947330, idle: 33762340, irq: 0 } },
+    { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 731440, nice: 0, sys: 480050, idle: 41223290, irq: 0 } },
+    { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 5755750, nice: 0, sys: 2955850, idle: 33731990, irq: 0 } },
+    { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 732420, nice: 0, sys: 481540, idle: 41218120, irq: 0 } },
+    { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 5719070, nice: 0, sys: 2924290, idle: 33797150, irq: 0 } },
+    { model: 'Intel(R) Core(TM) i7-4770HQ CPU @ 2.20GHz',
+        speed: 2200,
+        times: { user: 730490, nice: 0, sys: 478600, idle: 41221130, irq: 0 } } ]
+    { lo0:
+    [ { address: '127.0.0.1',
+        netmask: '255.0.0.0',
+        family: 'IPv4',
+        mac: '00:00:00:00:00:00',
+        internal: true,
+        cidr: '127.0.0.1/8' },
+        { address: '::1',
+        netmask: 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff',
+        family: 'IPv6',
+        mac: '00:00:00:00:00:00',
+        scopeid: 0,
+        internal: true,
+        cidr: '::1/128' },
+        { address: 'fe80::1',
+        netmask: 'ffff:ffff:ffff:ffff::',
+        family: 'IPv6',
+        mac: '00:00:00:00:00:00',
+        scopeid: 1,
+        internal: true,
+        cidr: 'fe80::1/64' } ],
+    en0:
+    [ { address: 'fe80::401:2b5d:ac9d:612b',
+        netmask: 'ffff:ffff:ffff:ffff::',
+        family: 'IPv6',
+        mac: 'ac:bc:32:9a:7c:21',
+        scopeid: 4,
+        internal: false,
+        cidr: 'fe80::401:2b5d:ac9d:612b/64' },
+        { address: '192.168.0.177',
+        netmask: '255.255.255.0',
+        family: 'IPv4',
+        mac: 'ac:bc:32:9a:7c:21',
+        internal: false,
+        cidr: '192.168.0.177/24' } ],
+    awdl0:
+    [ { address: 'fe80::3cde:f7ff:fef5:25cc',
+        netmask: 'ffff:ffff:ffff:ffff::',
+        family: 'IPv6',
+        mac: '3e:de:f7:f5:25:cc',
+        scopeid: 6,
+        internal: false,
+        cidr: 'fe80::3cde:f7ff:fef5:25cc/64' } ],
+    utun0:
+    [ { address: 'fe80::a5cd:fc09:e28d:ca71',
+        netmask: 'ffff:ffff:ffff:ffff::',
+        family: 'IPv6',
+        mac: '00:00:00:00:00:00',
+        scopeid: 10,
+        internal: false,
+        cidr: 'fe80::a5cd:fc09:e28d:ca71/64' } ] }
+        
+    */
+
+
+## 2. url
+자주사용하는 parse메소드
+
+@07_node.modules/02_node.url.js
+
+    var url = require('url');
+
+    //parse메소드의 두번째인자는 queryString의 parse여부임. default:false
+    var parsedObject = url.parse("http://www.hanbit.co.kr/store/books/loop.php?p_code=1234");
+    console.log(parsedObject);
+
+    /*
+    Url {
+    protocol: 'http:',
+    slashes: true,
+    auth: null,
+    host: 'www.hanbit.co.kr',
+    port: null,
+    hostname: 'www.hanbit.co.kr',
+    hash: null,
+    search: '?p_code=1234',
+    query: 'p_code=1234',
+    pathname: '/store/books/loop.php',
+    path: '/store/books/loop.php?p_code=1234',
+    href: 'http://www.hanbit.co.kr/store/books/loop.php?p_code=1234' }
+
+    */
+
+    /*
+    //url.parse("url",true)
+
+    Url {
+    protocol: 'http:',
+    slashes: true,
+    auth: null,
+    host: 'www.hanbit.co.kr',
+    port: null,
+    hostname: 'www.hanbit.co.kr',
+    hash: null,
+    search: '?p_code=1234',
+    query: { p_code: '1234' }, //<================== 객체
+    pathname: '/store/books/loop.php',
+    path: '/store/books/loop.php?p_code=1234',
+    href: 'http://www.hanbit.co.kr/store/books/loop.php?p_code=1234' }
+
+    */
+
+## 3.querystring
+
+@07_node.modules/03_node.querystring.js
+
+    var url = require('url');
+    var querystring = require('querystring');
+
+    var parsedObject = url.parse("http://www.hanbit.co.kr/store/books/loop.php?p_code=1234");
+
+
+    console.log(querystring.parse(parsedObject.query));
+
+    //querystring을 자바스크립트 객체로 리턴함.
+    //{ p_code: '1234' }
+
+
+## 4. util
+포맷팅지원
+
+
+@07_node.modules/04_node.util.js
+
+    // 모듈을 추출합니다.
+    var util = require('util');
+
+    // 모듈을 사용합니다.
+    var data = util.format('%d + %d = %d', 52, 273, 52 + 273);
+    console.log(data);
+
+
+## 5. crypto
+해시생성과 암호화 관련
+
+보통 프로그래밍에서 hash라 하면 다음 두가지임
+1. key/value형식의 자료형 => javascript의 객체
+2. 전자지문
+
+**hash : 원본문자열이 조금이라도 다르면 해쉬형태가 굉장히 많이 달라짐. 이를 avalache effect라고함.**
+
+
+@07_node.modules/05_node.crypto.js
+단방향 hashing테스트
+[api#crypto_hash_digest_encoding](https://nodejs.org/dist/latest-v8.x/docs/api/crypto.html#crypto_hash_digest_encoding)
+
+    const crypto =  require("crypto");
+
+    //해쉬생성
+    //sha256
+    let shasum = crypto.createHash('sha256');
+    shasum.update('mypassword');//messsage digest 를 통한 hashing
+    let output = shasum.digest('hex');//hash.digest([encoding])
+
+    //출력
+    console.log('crypto_hash : ',output);
+
+    //sha512
+    shasum = crypto.createHash('sha512');
+    shasum.update('mypassword');//messsage digest 를 통한 hashing
+    output = shasum.digest('hex');
+
+    //출력
+    console.log('crypto_hash : ',output);
+
+    /*
+    crypto_hash :  89e01536ac207279409d4de1e5253e01f4a1769e696db0d6062ca9b8f56767c8
+    crypto_hash :  a336f671080fbf4f2a230f313560ddf0d0c12dfcf1741e49e8722a234673037dc493caa8d291d8025f71089d63cea809cc8ae53e5b17054806837dbe4099c4ca
+    */
+
+양방향 암호화 테스트(비밀키를 이용한 암호화/복호화)
+@07_node.modules/05_node.crypto.js
+
+    //양방향 암호화
+    //변수선언
+    let key = '나만 알고 있는 비밀키';
+    let input = 'password';
+
+    //암호화
+    let cipher = crypto.createCipher('aes192',key);
+    cipher.update(input, 'utf8', 'base64');
+    let cipheredOutput = cipher.final('base64');
+
+    //암호화해제
+    let decipher = crypto.createDecipher('aes192', key);
+    decipher.update(cipheredOutput, 'base64','utf-8');
+    var decipheredOutput = decipher.final('utf8');
+
+    //출력
+    console.log("원래문자열 : ",input);
+    console.log("암호화 : ",cipheredOutput);
+    console.log("암호화 해제 : ",decipheredOutput);
+
+    /*
+        원래문자열 :  password
+        암호화 :  bFe/G3Ao6nXm211/wGQJkA==암호화 해제 :  password
+    */
+
+
+`cipher.update(data[, inputEncoding][, outputEncoding])`
+* inputEncoding은 data에 대한 인코딩 : 'utf8', 'ascii', or 'latin1'
+* outputEncoding은 encrypt될 문자열에 대한 인코딩 : 'latin1', 'base64', or 'hex'
+
+`cipher.final([outputEncoding])`
+* 리턴될 문자열에 대한 encoding : 'latin1', 'base64' or 'hex'
+* final메소드가 호출되면 cipher객체는 더이상 사용하지 못함. 다시 호출시 error
+
+`decipher.update(data[, inputEncoding][, outputEncoding])`
+* inputEncoding encrypt된 문자열에 대한 인코딩 : 'latin1', 'base64', or 'hex'
+
+`decipher.final([outputEncoding])`
+* 리턴될 문자열에 대한 encoding : 'utf8', 'ascii', or 'latin1'
+
+
+## 6.FileSystem 
+
+@07_node.modules/06_node.fs/textfile.txt
+
+    This is textfile.txt
+    안녕하세요, textfile.txt입니다.    
+
+
+@07_node.modules/06_node.fs/01_node.fs.js
+
+    const fs = require('fs');
+
+    //1. 파일읽기(sync)
+    // var text = fs.readFileSync("textfile.txt","utf-8");
+    // console.log(text);//한글깨짐 없음.
+
+    /*
+        1234
+        This is textfile.txt
+        안녕하세요, textfile.txt입니다.
+    */
+
+    //2. 파일읽기(async)
+    // fs.readFile("textfile.txt",'utf-8',function(error, data){
+    //     console.log(data);
+    // });
+    // console.log(1234);
+
+    /*
+        1234
+        This is textfile.txt
+        안녕하세요, textfile.txt입니다.
+    */
+
+
+    //쓰기작업할 문자열
+    var text = "Hello world"
+
+    //3. 파일쓰기(sync)
+    fs.writeFileSync("TextFileOtherWriteSync.txt",text, 'utf8');
+
+    //4. 파일쓰기(sync)
+    fs.writeFile("TextFileOtherWrite.txt", text, 'utf8', function(error){
+        console.log("WRITE FILE ASYNC COMPLETE");
+    });
+    console.log(1234);
+
+
+    /*
+        1234
+        WRITE FILE ASYNC COMPLETE
+    */
+
+
+## 예외처리
+@07_node.modules/06_node.fs/02_node.exception.handling.js
+
+    const fs = require('fs');
+
+    //존재하지 않는 파일읽기 : 프로그램 비정상 종료
+    var text = fs.readFileSync("textfile_.txt","utf-8");
+    /*
+        fs.js:646
+        return binding.open(pathModule._makeLong(path), stringToFlags(flags), mode);
+                        ^
+
+        Error: ENOENT: no such file or directory, open 'textfile_.txt'
+            at Object.fs.openSync (fs.js:646:18)
+            at Object.fs.readFileSync (fs.js:551:33)
+            at Object.<anonymous> (/Users/nobodj/Dropbox/Coding/node.js/07_node.modules/06_node.fs/02_node.exception.handling.js:3:15)
+            at Module._compile (module.js:652:30)
+            at Object.Module._extensions..js (module.js:663:10)
+            at Module.load (module.js:565:32)
+            at tryModuleLoad (module.js:505:12)
+            at Function.Module._load (module.js:497:3)
+            at Function.Module.runMain (module.js:693:10)
+            at startup (bootstrap_node.js:191:16)
+    */
+
+
+
+1. 동기화 메소드의 예외처리
+
+    try{
+        //1.읽기
+        // var text = fs.readFileSync("textfile_.txt","utf-8");
+        // console.log(text);
+
+        //2.쓰기
+        fs.writeFileSync("textfile.txt", "으라차차...","utf8");
+        console.log("FILE WRITE COMPLETE!");
+
+    } catch(e) {
+        console.log(e);
+    }
+    console.log("***** 프로그램 정상종료 *****")
+
+    /*
+        fs.js:646
+        return binding.open(pathModule._makeLong(path), stringToFlags(flags), mode);
+                        ^
+
+        Error: ENOENT: no such file or directory, open 'textfile_.txt'
+            at Object.fs.openSync (fs.js:646:18)
+            at Object.fs.readFileSync (fs.js:551:33)
+            at Object.<anonymous> (/Users/nobodj/Dropbox/Coding/node.js/07_node.modules/06_node.fs/02_node.exception.handling.js:3:15)
+            at Module._compile (module.js:652:30)
+            at Object.Module._extensions..js (module.js:663:10)
+            at Module.load (module.js:565:32)
+            at tryModuleLoad (module.js:505:12)
+            at Function.Module._load (module.js:497:3)
+            at Function.Module.runMain (module.js:693:10)
+            at startup (bootstrap_node.js:191:16)
+        DONGHYUNs-MacBook-Pro:06_node.fs nobodj$ node 02_node.exception.handling.js
+        { Error: ENOENT: no such file or directory, open 'textfile_.txt'
+            at Object.fs.openSync (fs.js:646:18)
+            at Object.fs.readFileSync (fs.js:551:33)
+            at Object.<anonymous> (/Users/nobodj/Dropbox/Coding/node.js/07_node.modules/06_node.fs/02_node.exception.handling.js:25:19)
+            at Module._compile (module.js:652:30)
+            at Object.Module._extensions..js (module.js:663:10)
+            at Module.load (module.js:565:32)
+            at tryModuleLoad (module.js:505:12)
+            at Function.Module._load (module.js:497:3)
+            at Function.Module.runMain (module.js:693:10)
+            at startup (bootstrap_node.js:191:16)
+        errno: -2,
+        code: 'ENOENT',
+        syscall: 'open',
+        path: 'textfile_.txt' }
+        ***** 프로그램 정상종료 *****
+    */
+
+2. 비동기메소드의 예외처리
+
+    //2.비동기메소드의 동기화처리
+    fs.readFile("textfile.txt",'utf-8',function(error, data){
+        if(error)
+            console.log(error);
+        else
+            console.log(data);
+    });
+
+    fs.writeFile("TextFileOtherWrite.txt", "안뇽", 'utf8', function(error){
+        if(error) 
+            console.log(error);
+        else
+            console.log("WRITE FILE ASYNC COMPLETE");
+
+    });
+    console.log("***** 프로그램 정상종료 *****");
+
+    /*
+        ***** 프로그램 정상종료 *****
+        WRITE FILE ASYNC COMPLETE
+        으라차차...
+    */
+
+    //(심화)조기리턴으로 리팩토링
+    fs.readFile("textfile.txt",'utf-8',function(error, data){
+        if(error) return console.log(error);
+            
+        console.log(data);
+    });
+
+    fs.writeFile("TextFileOtherWrite.txt", "안뇽", 'utf8', function(error){
+        if(error) return console.log(error);
+            
+        console.log("WRITE FILE ASYNC COMPLETE");
+
+    });

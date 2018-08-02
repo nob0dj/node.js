@@ -1,0 +1,191 @@
+# Events
+웹브라우져에서 사용하는 이벤트핸들러를 추가하는 것과 비슷하다.
+
+    <script>
+    // window 객체에 load 이벤트를 연결합니다.
+    window.addEventListener('load', function () {
+
+    });
+  </script>
+
+@08_node.events/01_node.event.exit.js
+
+    process.on('exit', (code) => {
+        console.log('About to exit with code : ${code}');
+    });
+
+    //Ctrl+Z로 js를 종료, code 매개변수에 0 대입
+    //bout to exit with code 0
+
+@08_node.events/02_node.event.uncaughtException.js
+template literals backtick(`)으로 감쌀것
+
+    //1.이벤트추가
+    //process객체에 exit이벤트 연결
+    process.on('exit',(code) => {
+        console.log(`About to exit with code : ${code}`);//template literals backtick(`)으로 감쌀것
+    });
+
+    //process객체에 uncaughtException이벤트 연결
+    process.on('uncaughtException', err =>{
+        console.log(`Caught Exception : ${err}`);
+    });
+
+    //2초 간격으로 3번 예외 발생
+    var count = 0;
+    var test = ()=>{
+        //탈출코드
+        count++;
+        if(count > 3) return;
+
+        //예외발생
+        setTimeout(test, 2000);
+        nonExist.foo();
+
+    };
+
+    setTimeout(test, 2000);
+
+이벤트제거
+2초간격으로 실행되는 uncaughtException을 처음 실행후에는 리스터함수를 제거함.
+
+@08_node.events/03_node.event.removeListener.js
+
+    //1.이벤트추가
+    var onUncaughtException = err => {
+        console.log(`Caught Exception : ${err}`);
+
+        //2.이벤트제거
+        process.removeListener('uncaughtException', onUncaughtException);
+    };
+
+    //process객체에 uncaughtException이벤트 연결
+    process.on('uncaughtException', onUncaughtException);
+
+    //2초 간격으로 3번 예외 발생
+    var count = 0;
+    var test = ()=>{
+        //탈출코드
+        count++;
+        if(count > 3) return;
+
+        //예외발생
+        setTimeout(test, 2000);
+        nonExist.foo();
+
+    };
+
+    setTimeout(test, 2000);
+
+    /*
+    //출력결과 : 한번실행후 에러나서 프로그램 종료.
+    Caught Exception : ReferenceError: nonExist is not defined
+    /Users/nobodj/Dropbox/Coding/node.js/08_node.events/03_node.event.removeListener.js:21
+        nonExist.foo();
+        ^
+
+    ReferenceError: nonExist is not defined
+        at Timeout.test [as _onTimeout] (/Users/nobodj/Dropbox/Coding/node.js/08_node.events/03_node.event.removeListener.js:21:5)
+        at ontimeout (timers.js:498:11)
+        at tryOnTimeout (timers.js:323:5)
+        at Timer.listOnTimeout (timers.js:290:5)
+    */
+
+
+이벤트 강제 발생
+emit의 사전적 의미
+
+    EMIT STH
+    (send out sth such as light, heat, sound, gas, etc.)
+    The metal container began to emit a clicking sound. 
+
+@08_node.events/04_node.event.emit.js
+
+    //exit이벤트 리스너 연결
+    process.on('exit',function(){
+        console.log("bye bye~!!");
+    });
+
+    //이벤트 강제발생
+    process.emit('exit');
+    process.emit('exit');
+    process.emit('exit');
+    process.emit('exit');
+
+    //프로그램 종료여부
+    console.log("프로그램 실행중...");
+
+    /*
+    bye bye~!! //=> emit함수에 의한 exit이벤트핸들러 호출
+    bye bye~!!
+    bye bye~!!
+    bye bye~!!
+    프로그램 실행중...
+    bye bye~!! //=> 실제 프로그램 종료(exit) 이벤트발생
+
+    */
+
+`process.emit('exit')`을 실행하면, 프로그램이 실제로 종료되는 것이 아니라, exit이벤트의 핸들러함수만 호출하는 것이다.
+프로그램을 실제로 종료하려면, `process.exit();`를 호출
+
+@08_node.events/04_node.event.emit.js
+
+    ...
+
+    //프로그램 종료
+    process.exit();//이후 코드는 실행되지 않음
+
+    //프로그램 종료여부
+    console.log("프로그램 실행중...정말??   ");
+
+
+이벤트생성
+이벤트를 연결하려는 객체는 EventEmitter객체를 상속받아야함.
+process객체도 EventEmitter객체를 상속받았음.
+
+이전버젼에서 EventEmitter생성자함수는 process객체에 속해있고, 이 객체를 통해 EventEmiiter생성자함수를 호출했었음.
+
+현재는 events내장객체를 가져와서 이 객체의 생성자함수를 호출함.
+
+
+    //EventEmitter객체생성
+    //var custom = new process.EventEmitter();//이전버젼에서 사용하던 방식으로 사용불가
+    var EventEmitter = require('events');
+    var custom = new EventEmitter();
+
+    //이벤트 연결
+    custom.on('tick', (code)=>{
+        console.log("tick이벤트 발생!!");
+    });
+
+    //이벤트 강제발생
+    custom.emit('tick');
+
+커스텀모듈테스트
+[매초 이벤트를 이용해서 콘솔상에 주기적으로 현재시간을 출력하는 타이머 모듈](https://javafa.gitbooks.io/nodejs_server_basic/content/chapter7.html)
+
+@08_node.events/06_node.EventEmitter/custom.module.timer.js
+
+    var EventEmitter = require('events');
+    // 1. setInterval 함수가 동작하는 interval 값을 설정합니다. 1초에 한번씩 호출
+    var sec = 1;
+
+    // 2. timer변수를 EventEmitter 로 초기화
+    exports.timer = new EventEmitter();
+
+    // 3. javascript 내장함수인 setInterval 을 사용해서 1초에 한번씩 timer 객체에 tick 이벤트 발생
+    setInterval(function(){
+        exports.timer.emit('tick');
+    }, sec*1000);
+
+@08_node.events/06_node.EventEmitter/app.js
+
+    var module = require('./custom.module.timer.js');
+
+    // 1. module 내부에 선언된 timer객체를 통해 tick 이벤트를 캐치하고, 이벤트 발생시마다 현재시간을 출력
+    module.timer.on('tick', function(time){
+        var time = new Date(); // 2. 현재 시간을 가져오기 위한 Date 객체 생성
+        console.log('now:'+time);
+    });
+
+
