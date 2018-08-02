@@ -360,3 +360,55 @@ post는 data이벤트핸들러를 이용해서 파라미터값에 접근할 수 
     });
 
    
+
+### 3.request.headers.cookie
+request객체의 headers객체의 cookie속성은 하나의 문자열임. 
+이를 parsing하는 방법을 학습
+
+@09_node.http.request/03_node.request.headers.cookie.js
+쿠키 파싱은 이후에 학습할 express모듈에서 대신 처리해줄수 있음.
+
+    var http = require('http');
+
+    http.createServer(function(req,res){
+        //쿠키존재여부에 따른 분기
+        if(req.headers.cookie){
+            //쿠키추출 : req.headers.cookie는 하나의 문자열임.
+            var cookie = req.headers.cookie.split(';').map(elem=>{
+                var temp = elem.split('=');
+                return {
+                    key:temp[0],
+                    value:temp[1]
+                }
+            });
+            
+            console.dir(cookie);
+            /*
+                [ { key: 'name', value: 'nobodj' },
+                { key: ' region', value: 'Seoul' } ]
+                [ { key: 'name', value: 'nobodj' },
+                { key: ' region', value: 'Seoul' } ]
+            */
+              
+            res.end("<h1>"+JSON.stringify(cookie)+"</h1>")
+        }
+        else{
+            //expire date설정
+            var d = new Date();
+            d.setDate(d.getDate()+7);
+
+            //쿠키생성
+            res.writeHead(200,{
+                'Content-Type':'text/html',
+                'Set-Cookie':['name=nobodj;Expires='+d,'region=Seoul;Expires='+d]
+            });
+            //응답
+            res.end('<h1>쿠키를 생성했습니다.</h1>');
+
+
+        }
+
+
+    }).listen(9999,function(){
+        console.log('Server running at http://127:0.0.1:9999/');
+    });
