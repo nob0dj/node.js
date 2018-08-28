@@ -318,7 +318,7 @@ post는 data이벤트핸들러를 이용해서 파라미터값에 접근할 수 
      /*
     //post방식 quertystring접근
     data.toString() => data_a=%EA%B9%80%EB%8F%99%ED%98%84&data_b=abc
-    JSON.stringify(data) => {"type":"Buffer","data":[100,97,116,97,95,97,61,37,69,65,37,66,57,37,56,48,37,69,66,37,56,70,37,57,57,37,69,68,37,57,56,37,56,52,38,100,97,116,97,95,98,61,97,98,99]}
+    JSON.stringify(data) => {"type":"Buffer","data":[100,97,116,97,95,97,61,37,69,6523,37,66,57,37,56,48,37,69,66,37,56,70,37,57,57,37,69,68,37,57,56,37,56,52,38,100,97,116,97,95,98,61,97,98,99]}
     JSON.stringify(querystring.parse(data.toString())) => {"data_a":"김동현","data_b":"ddd"}
 
     //크롬브라우져는 encoding이 auto-detection으로 변경됨. Set Character Encoding extension을 이용하여, default page encoding값을 UTF-8으로 변경후 정상출력됨.
@@ -396,6 +396,7 @@ request객체의 headers객체의 cookie속성은 하나의 문자열임.
             //expire date설정
             var d = new Date();
             d.setDate(d.getDate()+7);
+            
 
             //쿠키생성
             res.writeHead(200,{
