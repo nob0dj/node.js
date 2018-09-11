@@ -139,6 +139,8 @@ npm이 설치되면서 환경변수로 등록이 되어있는지 어느 디렉�
         ├── acorn@1.2.2
         └── acorn-globals@1.0.9
 
+[jade문법정리](http://jeong-pro.tistory.com/65)
+2016년 jade는 pug로 이름이 바뀌었다.
 
 
 @10_node.external.modules/02_node.jade.js
@@ -178,3 +180,192 @@ npm이 설치되면서 환경변수로 등록이 되어있는지 어느 디렉�
 한글깨짐현상 : charset=UTF-8 옵션 추가해서 해결
 
     res.writeHead(200, {'Content-Type':'text/html;charset=UTF-8'});
+
+style태그, script태그추가
+.기호를 찍어줘야 한다.
+
+@10_node.external.modules/02_html_.jade
+jade.js파일에서 읽어오는 파일을 02_html_.jade로 변경
+
+    doctype html
+    html
+        head
+            title   Index Page
+            style.
+                * {margin:0px; padding:0px;}
+                h1{color:red;}
+            script(src="https://code.jquery.com/jquery-1.12.4.js")
+            script.
+                $(function(){
+                    var alpha = 100;
+                });
+        body    
+            h1 Index Page
+
+
+jade파일에 데이터를 전달해서 render하기
+
+@10_node.external.modules/03_node.jade.js
+
+    var http = require('http');
+    var fs = require('fs');
+    var jade = require('jade');
+
+    http.createServer((req, res)=>{
+        //jade파일을 읽기
+        fs.readFile('03_html.jade', 'utf-8', (err,data)=>{
+            //jade모듈의 copile메소드 jade문자열을 html로 변환할 수 있는 함수리턴
+            var fn = jade.compile(data);
+            res.writeHead(200, {'Content-Type':'text/html;charset=UTF-8'});//한글깨짐 방지로 charset=UTF-8 옵션 추가
+            //fn함수호출을 통해 html로 출력
+            res.end(fn({
+                name : "김동현",
+                description : "Hello jade With Node.js..."
+            }));
+        });
+
+    }).listen(9999, ()=>{
+    console.log("Server Running at http://127.0.0.1:9999"); 
+    });
+
+
+jade특수기호
+
+* -Code : javascript 코드 입력
+* #{Value} : 데이터출력
+* =Value : 데이터출력
+
+
+@10_node.external.modules/03_html.jade
+* 들여쓰기가 필수(지켜지지 않을 경우 에러)
+* 자식태그 등록은 부모태그 아랫줄에 들여쓰기로 표현
+* 닫는 태그 없음.
+
+    doctype html
+    html
+        head
+            title jade with data
+        body
+            //jade string
+            h1 #{name}
+            h2= description
+            hr
+            p
+                | 여러줄 입력시에는 |를 이용함
+                | 여러줄 입력시에는 |를 이용함
+            //하나의 p태그안에 여러개의 a태그
+            p
+                -for(var i=0; i<10; i++){
+            
+                a(href='https://naver.com') 네이버가기 #{i}
+                -Í}
+            //p a태그
+            -for(var i=0; i<10; i++){
+            p
+                a(href='https://naver.com') 네이버가기 #{i+1}
+            -Í}
+
+
+
+서버실행모듈
+* 지역모듈 : js파일내부에서 require()함수로 호출
+* 전역모듈 : 터미널에서 곧바로 사용가능. 설치시 옵션 -g 사용
+
+## 3.supervisor 
+전역위치에 설치되므로 관리자권한이 필요해서 sudo로 설치
+`sudo npm install -g supervisor`
+
+js파일내용이 변경되면, 자동으로 reload해줌.
+
+@10_node.external.modules/04_node.supervisor.js
+
+    var http = require('http');
+
+    http.createServer((req,res)=>{
+        res.writeHead(200,{'Content-Type':'text/html'});
+        res.end('<h1>Test File</h1>');
+    }).listen(9999,()=>{
+        console.log("Server Running at http://127.0.0.1:9999")
+    });
+
+터미널에서 `supervisor 04_node.supervisor.js`로 실행하면,
+
+    Running node-supervisor with
+    program '04_node.supervisor.js'
+    --watch '.'
+    --extensions 'node,js'
+    --exec 'node'
+
+    Starting child process with 'node 04_node.supervisor.js'
+    Watching directory '/Users/nobodj/Dropbox/Coding/node.js/10_node.external.modules' for changes.
+    Press rs for restarting the process.
+    Server Running at http://127.0.0.1:9999
+
+
+파일변경후 저장
+    
+    res.end('<h1>Test File2</h1>');
+
+콘솔 출력
+
+    crashing child
+    Starting child process with 'node 04_node.supervisor.js'
+    Server Running at http://127.0.0.1:9999
+
+
+**반드시 서버프로그램만 supervisor로 실행할것**
+@04_node.supervisor.test.js를 실행하면, 프로세스 종료시 재실행해서 무한반복실행함.
+
+
+
+## 4. forever
+멀티스레드 기반의 웹서비스는 예외가 발생해도 전체서비스에는 영향을 주지 않지만, node같은 단일스레드는 예외하나로 프로그램이 죽어버린다.
+이러한 예외상황을 대비한것이 forever모듈이다.
+
+`sudo npm install -g forever`
+
+@10_node.external.modules/05_node.forever.js
+
+    var http = require('http');
+
+    http.createServer((req,res)=>{
+        if(req.url == '/'){
+            //응답
+            res.write("<!DOCTYPE html>");
+            res.write("<html>");
+            res.write("<head>");
+            res.write("<title>Forever</title>");
+            res.write("</head>");
+            res.write("<body>");
+            res.write("<h1>Forever Test</h1>");
+            res.write("</body>");
+            res.write("</html>");
+        }
+        else{
+            //오류발생
+            error.error.error();
+        }
+        
+    }).listen(9999,()=>{
+        console.log("Server Running at http://127.0.0.1:9999")
+    });
+
+`node 05_node.forever.js`로 실행시 `/`외의 주소로 요청하면, 에러가 나고 서버가 죽어버림
+`forever start 05_node.forever.js`로 실행시 `/`외의 주소로 요청해도, 에러가 나고 서버가 죽지 않음.
+
+`forever start --minUptime 5000 --spinSleepTime 1000 -a 05_node.forever.js`로 실행해서 성공
+minUptime과 spinSleepTime 설정해주니까 의도대로 동작함
+
+forever 옵션
+--minUptime      Minimum uptime (millis) for a script to not be considered "spinning"
+--spinSleepTime  Time to wait (millis) between launches of a spinning script.
+-m: max, crash가 일어났을 경우 최대 반복 횟수.
+-l : log 옵션
+-a 
+
+--spinSleepTime : 앱이 실패가 났을 경우 다시 올라올때까지 걸리는 시간을 입력
+앱이 죽어버렸는데 바로 올라와서 또 죽어버리고, 죽어버리고 무한 반복되면 안되니깐요..
+
+[forever 설치 및 사용법](http://todactodac.blogspot.com/2016/06/nodejs-forever.html)
+
+

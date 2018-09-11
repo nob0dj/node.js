@@ -1,0 +1,24 @@
+doctype html
+html
+    head
+        title jade with data
+    body
+        //jade string
+        h1 #{name}
+        h2= description
+        hr
+        p
+            | 여러줄 입력시에는 |를 이용함
+            | 여러줄 입력시에는 |를 이용함
+        //하나의 p태그안에 여러개의 a태그
+        p
+            -for(var i=0; i<10; i++){
+           
+            a(href='https://naver.com') 네이버가기 #{i}
+            -Í}
+        //p a태그
+        -for(var i=0; i<10; i++){
+        p
+            a(href='https://naver.com') 네이버가기 #{i+1}
+        -Í}
+        
