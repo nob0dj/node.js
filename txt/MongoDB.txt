@@ -1,0 +1,68 @@
+# MongoDB
+
+## 설치
+운영체제별 설치
+
+
+## 실행
+설치후 `C:\Program Files\MongoDB\Server\4.0\bin`경로의 실행파일 확인
+
+* mongod.exe는 MongoDB 서버 실행파일
+* mongo.exe는 MongoDB를 조작할수 있는 MongoDB Shell 프로그램
+
+mongodb는 루트디렉토리 밑의 data폴더를 사용함. data/db폴더를 생성하면 자동으로 데이터를 data/db에 저장함.
+
+@Windows: cmd
+
+    mkdir c:\data\db
+
+@C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe 실행
+데이터베이스 실행
+
+@C:\Program Files\MongoDB\Server\4.0\bin\mongo.exe 실행
+mongodb쉘 실행
+
+자바스크립트를 통한 제어
+
+    > 273+53
+    326
+    > var a = 0;
+    > for(var i=0; i<273; i++){
+    ... a+= i;
+    ... };
+    37128
+    > a
+    37128
+
+현재 db확인
+
+    > db
+    test
+
+db생성 및 이동
+
+    > use node
+    switched to db node
+    > db
+    node
+
+mongodb구조
+`데이터베이스 - 컬렉션 - 문서`
+
+컬렉션 생성
+
+    > db.createCollection('products');
+    { "ok" : 1 }
+
+
+## 데이터저장
+
+
+## 데이터검색
+
+
+## 데이터정렬
+
+## 데이터수정
+
+## 데이터삭제 

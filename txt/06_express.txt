@@ -511,52 +511,311 @@ body-parser미들웨어는 `application/x-www-form-urlencoded`인코딩방식만
 
 미들웨어 추가시 
     app.use(bodyParser());//deprecated => json/urlencoded메소드를 사용할 것.
+    app.use(bodyParser.urlencoded());//body-parser deprecated undefined extended: provide extended option 
     app.use(bodyParser.urlencoded({extended:false}));
 
 urlencoded메소드의 options
-* extended
+* extended : 중첩된 객체(nested object)사용여부
     * true : qs라이브러리 사용. 어떤 타입이든 가능.
     * false : querystring라이브러리 사용. string, array타입
+[body-parser 모듈 : urlencoded()의 옵션](http://sjh836.tistory.com/154)
+
+
+@11_node.express.module/05_node.express.middleware/06_body-parser/01_mw.bodyParser.js
+
+    // 모듈을 추출합니다.
+    var fs = require('fs');
+    var express = require('express');
+    var bodyParser = require('body-parser');
+
+    // 서버를 생성합니다.
+    var app = express();
+
+    // 미들웨어를 설정합니다.
+    app.use(bodyParser.urlencoded({ extended: false }));
+
+    // 라우터를 설정합니다.
+    //1. GET 방식 : url에 작성 http://127.0.0.1:52273/?name=김동현&age=20
+    app.get('/', (request, response) => {
+        var name = request.query.name;
+        var age = request.query.age;
+
+        var html = "<h2>GET : 전달된 매개변수</h2>";
+        html += "<hr>";
+        html += "<p>name="+name+"</p>";
+        html += "<p>age="+age+"</p>";
+        response.send(html);
+    });
+
+    //2.POST방식 : Postman 크롬확장프로그램 통해 요청. x-www-form-urlencoded인코딩 방식 선택할 것.
+    app.post('/', (request, response) => {
+        var name = request.body.name;
+        var age = request.body.age;
+
+        var html = "<h2>BODY : 전달된 매개변수</h2>";
+        html += "<hr>";
+        html += "<p>name="+name+"</p>";
+        html += "<p>age="+age+"</p>";
+        response.send(html);
+    });
+
+    // 서버를 실행합니다.
+    app.listen(52273, function () {
+    console.log('Server running at http://127.0.0.1:52273');
+    });
+
+
+## 7.connect-multiparty
+파일전송에 사용되는 multipart/form-data인코딩방식을 지원하는 모듈
+(body-parser는 application/x-www-form-urlencoded인코딩방식만 지원)
+
+html파일에서 form전송시 인코딩방식 multipart/form-data 속성지정하면, 지정 업로드 폴더에 파일이 rename되어서 저장됨.
+
+    app.use(multipart({ uploadDir: __dirname + '/upload' }));
+
+@11_node.express.module/05_node.express.middleware/07_connect-multiparty/upload
+폴더를 미리 만들어두어야 오류안남.
+
+@11_node.express.module/05_node.express.middleware/07_connect-multiparty/fileUpload.html
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Multipart Upload</title>
+    </head>
+    <body>
+    <h1>File Upload</h1>
+    <form method="post" enctype="multipart/form-data">
+        <table>
+        <tr>
+            <td>Comment: </td>
+            <td><input type="text" name="comment" /></td>
+        </tr>
+        <tr>
+            <td>File: </td>
+            <td><input type="file" name="upFile" /></td>
+        </tr>
+        </table>
+        <input type="submit" />
+    </form>
+    </body>
+    </html>
+
+@11_node.express.module/05_node.express.middleware/07_connect-multiparty/01_mw.connectMultiparty.js
+
+    // 모듈을 추출합니다.
+    var fs = require('fs');
+    var express = require('express');
+    var multipart = require('connect-multiparty');
+
+    // 서버를 생성합니다.
+    var app = express();
+
+    // 미들웨어를 설정합니다.
+    app.use(multipart({ uploadDir: __dirname + '/upload' }));
+
+    // 라우터를 설정합니다.
+    app.get('/', (request, response) => {
+        fs.readFile('fileUpload.html', (error, data) => {
+            response.send(data.toString());
+        });
+    });
+    app.post('/', (request, response) => {
+        console.log(request.body);//{ comment: 'ㅎㅎㅎ' }
+        console.log(request.files);
+
+        //파일 관련정보
+        var imageFile = request.files.image
+        console.log(imageFile.name);//originalFilename값 추출
+        console.log(imageFile.path);//C:\\Users\\nobodj\\Dropbox\\Coding\\node.js\\11_node.express.module\\05_node.express.middleware\\07_connect-multiparty\\upload\\Z1JVx7Jl_ncdxP2WUJhCRsdX.png
+
+        response.redirect("/");
+    });
+
+    /*
+    request.files 객체출력 : 
+
+    { upFile:
+        { fieldName: 'upFile',
+            originalFilename: 'hyunta.jpg',
+            path: 'C:\\Users\\nobodj\\Dropbox\\Coding\\node.js\\11_node.express.module\\05_node.express.middleware\\07_connect-multiparty\\upload\\DrAkOeCaIztDzPC_Cgq72gNm.jpg',
+            headers:
+            { 'content-disposition': 'form-data; name="image"; filename="hyunta.jpg"',
+                'content-type': 'image/jpeg' },
+            size: 26357,
+            name: 'hyunta.jpg',
+            type: 'image/jpeg' } 
+    }
+
+
+    */
+
+    // 서버를 실행합니다.
+    app.listen(52273, () => {
+    console.log('Server running at http://127.0.0.1:52273');
+    });
+
+
+
+파일이름을 변경(중복방지)
+UUID(Uiniversally Unique Identifier)를 지원하는 모듈 node-uuid등이 있다.
+[https://github.com/kelektiv/node-uuid](https://github.com/kelektiv/node-uuid)
+
+    app.post('/', (request, response) => {
+        // 변수를 선언합니다.
+        var comment = request.body.comment;
+        var imageFile = request.files.image;
+        
+        if (imageFile) {
+            // 변수를 선언합니다.
+            var name = imageFile.name;
+            var path = imageFile.path;
+            var type = imageFile.type;
+
+            //console.log(__dirname);//루트디렉토리의 절대경로 반환
+
+            // 이미지 파일 확인
+            if (type.indexOf('image') != -1) {
+                // 이미지 파일의 경우: 파일 이름을 변경합니다.
+                var outputPath = __dirname + '/upload/' + Date.now() + '_' + name;
+                fs.rename(path, outputPath, (error) => {
+                response.redirect('/');
+                });
+            } else {
+                // 이미지 파일이 아닌 경우: 파일을 제거합니다.
+                fs.unlink(path, error => {
+                response.sendStatus(400);
+                });
+            }
+        } 
+        else {
+            // 파일이 없을 경우
+            response.sendStatus(404);
+        }
+    });
+    
+만약, fileUpload.html에서 file태그의 multiple속성을 지정했다면, 해당fieldName에 파일배열이 지정되어 전송된다.
+
+미들웨어를 특정라우팅에만 적용할 수 있다. cookie-parser, body-parser, morgan등의 미들웨어와 다르게 connect-multiparty 같은 파일업로드 미들웨어는 특정페이지에서만 적용되는 경우가 많기때문이다
+지정한 특정라우팅진입시에만 multiparty 미들웨어가 수행되고, 사용자콜백함수가 적용된다.
+
+    app.post('/', multipart({ uploadDir: __dirname + '/upload' }), (request, response) => {
+        
+    });
+
+
+
+## 8.express-session
+connect.sid라는 쿠키는 express-session 모듈이 지정한 세션키임.
+
+cookie옵션객체지정
+* name : 쿠키이름
+* store : 쿠키저자오
+* cookie : 생성할 cookie관련정보
+* secret : 비밀키
+* resave : 세션이 변경되지 않아도 세션 저장소에 저장할지 여부(true|false)
+* saveUninitialized 초기화 되지 않은 세션을 세션 저장소에 저장할 지 설정(true|false)
+
+미들웨어 설정시
+secret, resave, saveUninitialized는 기본적으로 설정해줘야하는 옵션이다.
+cookie-maxAge정보를 통해서 세션유효시간을 설정할 수 있다.(milisecond)
+
+    app.use(session({
+        secret: 'secret key',
+        resave: false,
+        saveUninitialized: true,
+        cookie :{
+            maxAge : 60*1000
+        }
+    }));
+
+
+cookie옵션 기본값
+
+    {
+        "originalMaxAge": null,
+        "expires": null,
+        "httpOnly": true,
+        "path": "/"
+    }
+
+
+최초접속시각을 세션에 담아두는 예제
+
+@11_node.express.module/05_node.express.middleware/08_express-session/01.mw.expressSession.js
+new Date()객체가 리턴하는 것은 UTC시각이다. 우리나라는 UTC+9이라 toLocaleString()을 호출해야한다.
+(왜 자동으로 지역정보가 잡히지 않는거지ㅜ)
+
+    // 모듈을 추출합니다.
+    var express = require('express');
+    var session = require('express-session');
+
+    // 서버를 생성합니다.
+    var app = express();
+
+    // 미들웨어를 설정합니다.
+    app.use(session({
+        secret: 'secret key',
+        resave: false,
+        saveUninitialized: true,
+        cookie :{
+            maxAge : 60*1000
+        }
+    }));
+
+    app.get('/', (request, response) => { 
+        //최초접속시간을 session에 저장함.
+        var start = request.session.start;
+        if(!start) start = request.session.start = new Date().toLocaleString();
+        console.log(start);
+
+        response.send(request.session);
+    });
+
+    app.get('/a', (request, response) => {
+        //최초접속시간을 session에 저장함.
+        var start = request.session.start;
+        if(!start) start = request.session.start = new Date().toLocaleString();
+        console.log(start);
+
+        response.send(request.session);
+    });
+
+
+    // 서버를 실행합니다.
+    app.listen(52273, () => {
+    console.log('Server running at http://127.0.0.1:52273');
+    });
+
+
+세션제거
+
+    //세션제거
+    app.get('/destroy', (request, response) => {
+
+        request.session.destroy();
+        response.redirect("/");
+
+    });
+
 
 
 
 
 ## loginCheck 
+@11/node.express.module/loginCheck
+
+nodejs의 this는 브라우져의 window객체가 아닌 module.exports객체이다.
+객체 안에서 객체필드를 호출하기 위해서는 `변수.필드명`으로 접근한다.
+
 
 @DummyDB.js
 
-    //로그인체크용 더미데이터베이스구현
-    var DummyDB = (function(){
-        //변수선언
-        var DummyDB = {};
-        var storage = [];
-        var count = 1;
+@loginApp.js
 
-        //초기화
-        var user = {
-            id : 'honggd',
-            name : '홍길동',
-            password : '1234'
-        }
-        storage.push(user);
+@index.jade
 
-        //로그인체크함수
-        DummyDB.loginCheck = function(id,password){
-            //로그인성공 => 1 리턴
-            //비밀번호가 틀리면 => 0 리턴
-            //아이디가 존재하지 않으면 => -1 리턴
-            for(var i in storage){
-                if(storage[i].id === id){
-                    if(storage[i].password === password){
-                        return 1;
-                    }
-                    else {
-                        return 0;
-                    }
-                }
-            }
+@login.html
 
-            return -1;
-        }
 
-    })();
+
