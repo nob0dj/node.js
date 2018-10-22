@@ -1,0 +1,644 @@
+# MongoDB
+
+## 설치
+운영체제별 설치
+
+
+## 실행
+설치후 `C:\Program Files\MongoDB\Server\4.0\bin`경로의 실행파일 확인
+
+* mongod.exe는 MongoDB 서버 실행파일
+* mongo.exe는 MongoDB를 조작할수 있는 MongoDB Shell 프로그램
+
+mongodb는 루트디렉토리 밑의 data폴더를 사용함. data/db폴더를 생성하면 자동으로 데이터를 data/db에 저장함.
+
+@Windows: cmd
+
+    mkdir c:\data\db
+
+@C:\Program Files\MongoDB\Server\4.0\bin\mongod.exe 실행
+데이터베이스 실행
+
+@C:\Program Files\MongoDB\Server\4.0\bin\mongo.exe 실행
+mongodb쉘 실행
+
+자바스크립트를 통한 제어
+
+    > 273+53
+    326
+    > var a = 0;
+    > for(var i=0; i<273; i++){
+    ... a+= i;
+    ... };
+    37128
+    > a
+    37128
+
+현재 db확인
+
+    > db
+    test
+
+전체 db확인
+
+    > show dbs
+    admin   0.000GB
+    config  0.000GB
+    local   0.000GB
+
+db생성 및 이동
+
+    > use node
+    switched to db node
+    > db
+    node
+
+mongodb구조
+`데이터베이스 - 컬렉션 - 문서`
+
+
+
+컬렉션 생성
+
+    > db.createCollection('products');
+    { "ok" : 1 }
+    > show collections
+    products
+
+## 데이터저장
+별도의 컬럼지정 없이 자바스크립트객체를 전달하면, json타입으로 데이터를 저장한다. RDBMS처럼 컬럼형식을 지정할 필요가 없다.
+
+자동으로 생성되는 _id속성은 입력된 시각을 기반으로 만들어진 고유값으로 문서(레코드)를 구분할 수 있는 고유값이다.
+
+    > db.products.save({name:'pencil',price:500});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.find();
+    { "_id" : ObjectId("5b9b11bb9426722d3c212369"), "name" : "pencil", "price" : 500 }
+    >
+
+데이터추가
+
+    > db.products.save({id: 'erasor413', name:'eraser',price:500});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'notebook345', name:'notebook',price:2000});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'glue30924', name:'glue',price:700});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'scissors3892473', name:'scissors',price:2000});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'stapler239814', name:'stapler',price:3000});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'pen92375', name:'pen',price:1000});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'brush43740', name:'brush',price:2000});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'knife56432q', name:'knife',price:500});
+    WriteResult({ "nInserted" : 1 })
+    > db.products.save({id: 'protractor65413', name:'protractor',price:500});
+    WriteResult({ "nInserted" : 1 })
+    >
+
+## 데이터검색
+[[MongoDB] 강좌 3편 Document Query(조회) – find() 메소드](https://velopert.com/479)
+find명령어의 다양한 사용법을 학습한다.
+
+    > db.products.find()
+    { "_id" : ObjectId("5b9b11bb9426722d3c212369"), "name" : "pencil", "price" : 500 }
+    { "_id" : ObjectId("5b9b12769426722d3c21236a"), "name" : "eraser", "price" : 500 }
+    { "_id" : ObjectId("5b9b12829426722d3c21236b"), "name" : "notebook", "price" : 2000 }
+    { "_id" : ObjectId("5b9b128d9426722d3c21236c"), "name" : "glue", "price" : 700 }
+    { "_id" : ObjectId("5b9b129a9426722d3c21236d"), "name" : "scissors", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12a79426722d3c21236e"), "name" : "stapler", "price" : 3000 }
+    { "_id" : ObjectId("5b9b12b09426722d3c21236f"), "name" : "pen", "price" : 1000 }
+    { "_id" : ObjectId("5b9b12bb9426722d3c212370"), "name" : "brush", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12c59426722d3c212371"), "name" : "knife", "price" : 500 }
+    { "_id" : ObjectId("5b9b12d39426722d3c212372"), "name" : "protractor", "price" : 500 }
+
+
+원하는 컬럼만 보기
+두번쩨 인자로 보이거나, 안보일 컬럼데이터를 담은 객체 전달
+        
+    {_id:false}
+    {name:true}
+
+* true : 특정컬럼만 보이게 하기
+* false : 전체컬럼중에 특정컬럼 제외하기
+
+    > db.products.find({},{_id:false})
+    { "name" : "pencil", "price" : 500 }
+    { "name" : "eraser", "price" : 500 }
+    { "name" : "notebook", "price" : 2000 }
+    { "name" : "glue", "price" : 700 }
+    { "name" : "scissors", "price" : 2000 }
+    { "name" : "stapler", "price" : 3000 }
+    { "name" : "pen", "price" : 1000 }
+    { "name" : "brush", "price" : 2000 }
+    { "name" : "knife", "price" : 500 }
+    { "name" : "protractor", "price" : 500 }
+
+true/false값을 섞어쓰면 에러남
+
+    > db.products.find({},{_id:true, name:false})
+    Error: error: {
+            "ok" : 0,
+            "errmsg" : "Projection cannot have a mix of inclusion and exclusion.",
+            "code" : 2,
+            "codeName" : "BadValue"
+    }
+
+첫번째 매개변수는 조건을 제시할 수 있다. RDBMS의 where절과 유사함.
+
+    > db.products.find({price:500},{_id:false})
+    { "name" : "pencil", "price" : 500 }
+    { "name" : "eraser", "price" : 500 }
+    { "name" : "knife", "price" : 500 }
+    { "name" : "protractor", "price" : 500 }
+
+가격이 500원이상이 제품을 검색하고 싶다면
+
+    > db.products.find({price:{$gt:500}},{_id:false})
+    { "name" : "notebook", "price" : 2000 }
+    { "name" : "glue", "price" : 700 }
+    { "name" : "scissors", "price" : 2000 }
+    { "name" : "stapler", "price" : 3000 }
+    { "name" : "pen", "price" : 1000 }
+    { "name" : "brush", "price" : 2000 }
+
+* $eq	(equals) 주어진 값과 일치하는 값
+* $gt	(greater than) 주어진 값보다 큰 값
+* $gte	(greather than or equals) 주어진 값보다 크거나 같은 값
+* $lt	(less than) 주어진 값보다 작은 값
+* $lte	(less than or equals) 주어진 값보다 작거나 같은 값
+* $ne	(not equal) 주어진 값과 일치하지 않는 값
+* $in	주어진 배열 안에 속하는 값
+* $nin	주어빈 배열 안에 속하지 않는 값
+
+가격이 500원이상 1000원미만 제품을 검색하려면
+
+    > db.products.find({price:{$gte:500,$lt:1000}},{_id:false})
+    { "name" : "pencil", "price" : 500 }
+    { "name" : "eraser", "price" : 500 }
+    { "name" : "glue", "price" : 700 }
+    { "name" : "knife", "price" : 500 }
+    { "name" : "protractor", "price" : 500 }
+
+최초로 검색된 하나의 레코드만 검색하기 : findOne()
+
+    > db.products.findOne({price:{$gte:500,$lt:1000}},{_id:false})
+    { "name" : "pencil", "price" : 500 }
+
+
+
+## 데이터정렬
+sort메소드를 chaining형식으로 호출함.
+정렬기준이 될 필드를 제시
+* 1 : 오름차순
+* -1 : 내림차순
+
+가격기준으로 오름차순
+
+    > db.products.find({},{_id:false}).sort({price:1});
+    { "name" : "pencil", "price" : 500 }
+    { "name" : "eraser", "price" : 500 }
+    { "name" : "knife", "price" : 500 }
+    { "name" : "protractor", "price" : 500 }
+    { "name" : "glue", "price" : 700 }
+    { "name" : "pen", "price" : 1000 }
+    { "name" : "notebook", "price" : 2000 }
+    { "name" : "scissors", "price" : 2000 }
+    { "name" : "brush", "price" : 2000 }
+    { "name" : "stapler", "price" : 3000 }
+
+가격, name기준으로 오름차순
+
+    > db.products.find({},{_id:false}).sort({price:1, name:1});
+    { "name" : "eraser", "price" : 500 }
+    { "name" : "knife", "price" : 500 }
+    { "name" : "pencil", "price" : 500 }
+    { "name" : "protractor", "price" : 500 }
+    { "name" : "glue", "price" : 700 }
+    { "name" : "pen", "price" : 1000 }
+    { "name" : "brush", "price" : 2000 }
+    { "name" : "notebook", "price" : 2000 }
+    { "name" : "scissors", "price" : 2000 }
+    { "name" : "stapler", "price" : 3000 }
+
+
+## 데이터수정
+* save()
+* update() : [[MongoDB] 강좌 5편 Document 수정 – update() 메소드](https://velopert.com/545)
+
+1. save메소드
+(주의) find메소드의 결과는 배열, findOne메소드의 결과는 객체이다.
+아래 두 결과는 동일하다.
+
+    var temp = db.products.findOne({name:'knife'});
+    var temp = db.products.find({name:'knife'})[0];
+
+
+    > var temp = db.products.findOne({name:'knife'});
+    > temp
+    {
+            "_id" : ObjectId("5b9b12c59426722d3c212371"),
+            "name" : "knife",
+            "price" : 500
+    }
+    > temp.price = 700;
+    700
+    > temp
+    {
+            "_id" : ObjectId("5b9b12c59426722d3c212371"),
+            "name" : "knife",
+            "price" : 700
+    }
+    > db.products.save(temp);
+    WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+    > db.products.findOne({name:'knife'});
+    {
+            "_id" : ObjectId("5b9b12c59426722d3c212371"),
+            "name" : "knife",
+            "price" : 700
+    }
+    
+2. update 
+    db.collection.update(
+        조건객체,
+        업데이트객체,
+        옵션객체
+    );
+
+옵션객체 : 
+    {
+        upsert: true|false, //기본값 false
+        multi : true|false, //기본값 false
+        writeConcern : (document)
+    }
+**upsert : update+insert => 변경할 대상이 있으면 변경, 없으면 추가**
+
+
+    > db.products.update({name:'knife'},{$set:{price:1000}},{upsert:false, multi:true});
+    WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+    > db.products.findOne({name:'knife'});
+    {
+            "_id" : ObjectId("5b9b12c59426722d3c212371"),
+            "name" : "knife",
+            "price" : 1000
+    }
+
+upsert테스트 
+아래와 같이 price속성만 추가됨ㅜㅠ
+
+    > db.products.update({name:'fork'},{$set:{price:900}},{upsert:true});
+    WriteResult({
+            "nMatched" : 0,
+            "nUpserted" : 1,
+            "nModified" : 0,
+            "_id" : ObjectId("5b9b385e12af0629fc8dcc42")
+    })
+    > db.products.find({},{name:true,price:true});
+    { "_id" : ObjectId("5b9b11bb9426722d3c212369"), "name" : "pencil", "price" : 500 }
+    { "_id" : ObjectId("5b9b12769426722d3c21236a"), "name" : "eraser", "price" : 500 }
+    { "_id" : ObjectId("5b9b12829426722d3c21236b"), "name" : "notebook", "price" : 2000 }
+    { "_id" : ObjectId("5b9b128d9426722d3c21236c"), "name" : "glue", "price" : 700 }
+    { "_id" : ObjectId("5b9b129a9426722d3c21236d"), "name" : "scissors", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12a79426722d3c21236e"), "name" : "stapler", "price" : 3000 }
+    { "_id" : ObjectId("5b9b12b09426722d3c21236f"), "name" : "pen", "price" : 1000 }
+    { "_id" : ObjectId("5b9b12bb9426722d3c212370"), "name" : "brush", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12c59426722d3c212371"), "name" : "knife", "price" : 1000 }
+    { "_id" : ObjectId("5b9b12d39426722d3c212372"), "name" : "protractor", "price" : 500 }
+    { "_id" : ObjectId("5b9b344d9426722d3c212373"), "price" : 700 }
+    { "_id" : ObjectId("5b9b385e12af0629fc8dcc42"), "name" : "fork", "price" : 900 }
+    >
+
+## 데이터삭제 
+remove메소드의 첫번째로 query객체 전달.
+
+    > db.products.remove({name:'knife'});
+    WriteResult({ "nRemoved" : 1 })
+    > db.products.find({},{name:true,price:true});
+    { "_id" : ObjectId("5b9b11bb9426722d3c212369"), "name" : "pencil", "price" : 500 }
+    { "_id" : ObjectId("5b9b12769426722d3c21236a"), "name" : "eraser", "price" : 500 }
+    { "_id" : ObjectId("5b9b12829426722d3c21236b"), "name" : "notebook", "price" : 2000 }
+    { "_id" : ObjectId("5b9b128d9426722d3c21236c"), "name" : "glue", "price" : 700 }
+    { "_id" : ObjectId("5b9b129a9426722d3c21236d"), "name" : "scissors", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12a79426722d3c21236e"), "name" : "stapler", "price" : 3000 }
+    { "_id" : ObjectId("5b9b12b09426722d3c21236f"), "name" : "pen", "price" : 1000 }
+    { "_id" : ObjectId("5b9b12bb9426722d3c212370"), "name" : "brush", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12d39426722d3c212372"), "name" : "protractor", "price" : 500 }
+    { "_id" : ObjectId("5b9b385e12af0629fc8dcc42"), "name" : "fork", "price" : 900 }
+    
+
+아래와 같이 _id도 가능함.
+
+    > db.products.remove({"_id" : ObjectId("5b9b344d9426722d3c212373")});
+    WriteResult({ "nRemoved" : 1 })
+    > db.products.find({},{name:true,price:true});
+    { "_id" : ObjectId("5b9b11bb9426722d3c212369"), "name" : "pencil", "price" : 500 }
+    { "_id" : ObjectId("5b9b12769426722d3c21236a"), "name" : "eraser", "price" : 500 }
+    { "_id" : ObjectId("5b9b12829426722d3c21236b"), "name" : "notebook", "price" : 2000 }
+    { "_id" : ObjectId("5b9b128d9426722d3c21236c"), "name" : "glue", "price" : 700 }
+    { "_id" : ObjectId("5b9b129a9426722d3c21236d"), "name" : "scissors", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12a79426722d3c21236e"), "name" : "stapler", "price" : 3000 }
+    { "_id" : ObjectId("5b9b12b09426722d3c21236f"), "name" : "pen", "price" : 1000 }
+    { "_id" : ObjectId("5b9b12bb9426722d3c212370"), "name" : "brush", "price" : 2000 }
+    { "_id" : ObjectId("5b9b12c59426722d3c212371"), "name" : "knife", "price" : 1000 }
+    { "_id" : ObjectId("5b9b12d39426722d3c212372"), "name" : "protractor", "price" : 500 }
+    { "_id" : ObjectId("5b9b385e12af0629fc8dcc42"), "name" : "fork", "price" : 900 }
+
+
+## 페이징
+* 페이지당 표시할 컨텐츠수 :contensPerPage
+* pageNo
+
+`db.products.find().sort({price:1}).skip((pageNo-1)*contentsPerPage).limit(contentsPerPage);`
+
+
+    > db.products.find().sort({price:1}).skip((1-1)*3).limit(3); //1페이지
+    { "_id" : ObjectId("5b9b11bb9426722d3c212369"), "name" : "pencil", "price" : 500 }
+    { "_id" : ObjectId("5b9b12769426722d3c21236a"), "name" : "eraser", "price" : 500 }
+    { "_id" : ObjectId("5b9b12d39426722d3c212372"), "name" : "protractor", "price" : 500 }
+    > db.products.find().sort({price:1}).skip((2-1)*3).limit(3); //2페이지
+    { "_id" : ObjectId("5b9b128d9426722d3c21236c"), "name" : "glue", "price" : 700 }
+    { "_id" : ObjectId("5b9b385e12af0629fc8dcc42"), "name" : "fork", "price" : 900 }
+    { "_id" : ObjectId("5b9b12b09426722d3c21236f"), "name" : "pen", "price" : 1000 }
+
+
+## nodejs와 연동해 사용하기 : mongojs
+`npm install mongojs`
+[mongonjs api](https://www.npmjs.com/package/mongojs)
+
+@12_MongoDB/01_mongojs.js
+`mongojs(db명, 컬렉션명));`
+
+    var mongojs = require('mongojs');
+    var db = mongojs('node',['products']);
+
+    //데이터추출
+    db.products.find((error, data)=>{
+        console.log(data);
+    });
+
+
+
+--------------------------------------------------------------------------
+
+
+## mongodb를 이용한 crud구현
+
+1. 제품리스트출력
+
+@12_MongoDB/02_mongodb.crud.js
+
+    // 모듈을 추출합니다.
+    var fs = require('fs');
+    var ejs = require('ejs');
+    var express = require('express');
+    var bodyParser = require('body-parser');
+
+    //mongodb관련
+    var mongojs = require('mongojs');
+    var db = mongojs('node',['products']);
+
+    // 서버를 생성합니다.
+    var app = express();
+    app.use(bodyParser.urlencoded({
+    extended: false
+    }));
+
+    // 서버를 실행합니다.
+    app.listen(52273, () => {
+    console.log('server running at http://127.0.0.1:52273');
+    });
+
+    // 라우트를 수행합니다.
+    app.get('/', (request, response) => {
+        // 파일을 읽습니다.
+        fs.readFile('list.html', 'utf8', (error, data) => {
+            // 데이터베이스 쿼리를 실행합니다.
+            db.products.find((error, result)=>{
+                //console.log(result)
+
+            // 응답합니다.
+            // ejs.render메소드의 첫번째 인자는 list.html을 읽어온 데이터 data이고, 
+            //두번째 인자는 여기에 전달한 db데이터이다.
+            response.send(ejs.render(data, {
+                data: result
+            }));
+            });
+        });
+    });
+
+
+@12_MongoDB/list.html
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>List Page</title>
+    </head>
+    <body>
+    <h1>List Page</h1>
+    
+    <table width="100%" border="1">
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Price</th>
+        </tr>
+        <% data.forEach((item, index) => { %>
+        <tr>
+            <td><%= item.id %></td>
+            <td><%= item.name %></td>
+            <td><%= item.price %></td>
+        </tr>
+        <% }); %>
+    </table>
+    </body>
+    </html>
+
+
+2. 제품추가
+@12_MongoDB/list.html
+
+    <h1>List Page</h1>
+    <a href="/insert">INSERT DATA</a>
+    <hr />
+    ...
+
+@12_MongoDB/02_mongodb.crud.js
+라우팅추가. insertPage호출(GET)
+
+    app.get('/insert', (request, response) => {
+        // 파일을 읽습니다.
+        fs.readFile('insert.html', 'utf8', (error, data) => {
+            // 응답합니다.
+            response.send(data);
+        });
+    });
+
+@12_MongoDB/insert.html
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+    <title>Insert Page</title>
+    </head>
+    <body>
+    <h1>Insert Page</h1>
+    <hr />
+    <form method="post">
+        <fieldset>
+        <legend>INSERT DATA</legend>
+        <table>
+            <tr>
+            <td><label>Id</label></td>
+            <td><input type="text" name="id" /></td>
+            </tr>
+            <tr>
+            <td><label>Name</label></td>
+            <td><input type="text" name="name" /></td>
+            </tr>
+            <tr>
+            <td><label>Price</label></td>
+            <td><input type="text" name="price" /></td>
+            </tr>
+        </table>
+        <input type="submit" />
+        </fieldset>
+    </form>
+    </body>
+    </html>
+
+@12_MongoDB/02_mongodb.crud.js
+사용자 요청처리
+
+    app.post('/insert', (request, response) => {
+    // 변수를 선언합니다.
+    var body = request.body;
+
+    // 데이터베이스 쿼리를 실행합니다.
+    db.products.save({
+        id:body.id,
+        name :body.name,
+        price : body.price
+    });
+
+    response.redirect('/');
+    });
+
+
+
+
+3. 제품수정
+    * save메소드를 이용한  수정
+    * update메소드를 이용한 수정(추가할것)
+
+@12_MongoDB/list.html  
+
+    <td><a href="/edit/<%= item.id %>">EDIT</a></td>
+
+
+@12_MongoDB/02_mongodb.crud.js
+
+   app.get('/edit/:id', (request, response)=>{
+        //   console.log("request.params.id=",request.params.id);
+
+        // 파일을 읽습니다.
+        fs.readFile('edit.html', 'utf8',(error, data) => {
+            // 데이터베이스 쿼리를 실행합니다.
+            db.products.findOne({
+                id : request.params.id
+            },(error, docs)=>{
+                //console.log(docs)
+
+            // 응답합니다.
+            // ejs.render메소드의 첫번째 인자는 list.html을 읽어온 데이터 data이고, 
+            //두번째 인자는 여기에 전달한 db데이터이다.
+            response.send(ejs.render(data, {
+                data: docs
+            }));
+            });
+        });
+    });
+
+@12_MongoDB/edit.html
+save메소드 사용을 위해 _id속성을 hidden필드에 담아둠.
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Edit Page</title>
+    </head>
+    <body>
+        <h1>Edit Page</h1>
+        <hr />
+        <form method="post">
+            <fieldset>
+            <legend>Edit Data</legend>
+            <table>
+                <tr>
+                    <td><label>Id</label></td>
+                    <td><input type="text" name="id" value="<%= data.id %>" readonly /></td>
+                </tr>
+                <tr>
+                    <td><label>Name</label></td>
+                    <td><input type="text" name="name" value="<%= data.name %>" /></td>
+                </tr>
+                <tr>
+                    <td><label>Price</label></td>
+                    <td>
+                        <input type="number" name="price"
+                            value="<%= data.price %>" />
+                    </td>
+                </tr>
+            </table>
+            <input type="hidden" name="_id" value="<%=data._id %>">
+            <input type="submit" />
+            </fieldset>
+        </form>
+    </body>
+    </html>
+
+
+@12_MongoDB/02_mongodb.crud.js
+수정요청처리
+document의 고유값을 나타내는 _id는 이와같이 호출해야함. 그렇지 않으면 별개의 document로 인지함.
+`_id: mongojs.ObjectId(body._id)`
+
+    app.post('/edit/:id', function (request, response) {
+        // 변수를 선언합니다.
+        var body = request.body;
+        
+        var temp = {
+            _id: mongojs.ObjectId(body._id),//document의 고유값을 나타내는 _id는 이와같이 호출해야함. 그렇지 않으면 별개의 document로 인지함.
+            id:body.id,
+            name : body.name,
+            price : body.price
+        }
+        console.log(temp);
+        // 데이터베이스 쿼리를 실행합니다.
+        db.products.save(temp);
+
+        // 응답합니다.
+        response.redirect('/');
+    });
+
+
+4. 제품 삭제
+
+@12_MongoDB/list.html
+링크추가
+
+    <td><a href="/delete/<%= item.id %>">DELETE</a></td>
+
+@12_MongoDB/02_mongodb.crud.js
+
+    app.get('/delete/:id', (request, response) => {
+        var del_id = request.params.id;
+
+        // 데이터베이스 쿼리를 실행합니다.
+        db.products.remove({id:del_id});
+
+        // 응답합니다.
+        response.redirect('/');
+    });

@@ -7,7 +7,7 @@ var multipart = require('connect-multiparty');
 var app = express();
 
 // 미들웨어를 설정합니다.
-// app.use(multipart({ uploadDir: __dirname + '/upload' }));
+app.use(multipart({ uploadDir: __dirname + '/upload' }));
 
 // 라우터를 설정합니다.
 app.get('/', (request, response) => {
@@ -17,7 +17,7 @@ app.get('/', (request, response) => {
 });
 
 
-app.post('/',multipart({ uploadDir: __dirname + '/upload' }), (request, response) => {
+app.post('/', (request, response) => {
     console.log(request.body);//{ comment: 'ㅎㅎㅎ' }
     console.log(request.files);
 

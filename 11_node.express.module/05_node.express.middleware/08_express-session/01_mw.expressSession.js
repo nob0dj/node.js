@@ -20,7 +20,7 @@ app.get('/', (request, response) => {
     var start = request.session.start;
     if(!start) start = request.session.start = new Date().toLocaleString();
     console.log(start);
-    request.session.log += ' /';
+
     response.send(request.session);
 });
 
@@ -29,11 +29,11 @@ app.get('/a', (request, response) => {
     var start = request.session.start;
     if(!start) start = request.session.start = new Date().toLocaleString();
     console.log(start);
-    request.session.log += ' /a';
+
     response.send(request.session);
 });
 
-
+//세션제거
 app.get('/destroy', (request, response) => {
 
     request.session.destroy();
